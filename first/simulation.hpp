@@ -15,6 +15,7 @@ public:
     void applyGravity();
     void addParticle(int x, int y, int radius);
     void applyConstrains();
+    void applyConstrainsCircle();
     void solveCollisions();
     void draw();
     
