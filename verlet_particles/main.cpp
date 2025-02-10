@@ -2,6 +2,10 @@
 #include "simulation.hpp"
 #include <iostream>
 
+// inspired by 
+// https://www.youtube.com/watch?v=lS_qeBy3aQI
+// also includes link to the git repo
+
 int main(void) {
     // Initialization
     const int SCREEN_WIDTH = 1000;
