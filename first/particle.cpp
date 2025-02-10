@@ -4,7 +4,7 @@
 #include <iostream>
 
 void Particle::draw() const {
-    DrawCircle(position.x, position.y, radius, DARKBLUE);
+    DrawCircle(position.x, position.y, radius, color);
 }
 
 void Particle::udpatePosition(float dt) {

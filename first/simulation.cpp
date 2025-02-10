@@ -5,12 +5,12 @@
 
 void Simulation::update(float dt) {
     
-    const int sub_step = 8;
+    const int sub_step = 4;
     const float sub_dt = dt / (float)sub_step;
     for (int i=0; i<sub_step; i++){
         applyGravity();
-        applyConstrainsCircle();
         solveCollisions();
+        applyConstrainsCircle();
         updatePositions(sub_dt);
     }
 }
@@ -41,73 +41,59 @@ void Simulation::applyConstrainsCircle() {
             position.y - particle.getY()
         };
         const float distance = Vector2Length(to_obj);
-        if (distance > radius - 15.0f) {
+        if (distance > radius - particle.getRadius()) {
             const Vector2 n {
                 to_obj.x / distance,
                 to_obj.y / distance
             };
-
-            std::cout << "--------------" << "\n";
-            std::cout << n.x << " n " << n.y << "\n";
-            std::cout << particle.getX() << " " << particle.getY() << "\n";
-            particle.setX(position.x - n.x * (radius - 15.0f));
-            particle.setY(position.y - n.y * (radius - 15.0f));
-            std::cout << distance << "\n";
-
-            std::cout << particle.getX() << " " << particle.getY() << "\n";
-            std::cout << "--------------" << "\n";
-
-
+            particle.setX(position.x - n.x * (radius - particle.getRadius()));
+            particle.setY(position.y - n.y * (radius - particle.getRadius()));
         }
 
-    }
-}
-
-// not functional
-void Simulation::applyConstrains() {
-    for (Particle& particle : particles) {
-        float p_radius = particle.getRadius();
-        if (particle.getX() > width - p_radius) {
-            particle.setX(width - p_radius);
-            particle.reflectX();
-        }
-        if (particle.getX() < p_radius) {
-            particle.setX(0);
-            particle.reflectX();
-        }
-        if (particle.getY() > height - p_radius) {
-            particle.setY(height - p_radius);
-            particle.reflectY();
-        }
-        if (particle.getY() < p_radius) {
-            particle.setY(0);
-            particle.reflectY();
-        }
     }
 }
 
 void Simulation::solveCollisions() {
+    const float response_coef = 0.75f;
     for (int i=0; i<particles.size(); i++) {
         Particle& p1 = particles[i]; 
         for (int j=i+1; j<particles.size(); j++) {
             Particle& p2 = particles[j];
-            const float distance = p1.getDistance(p2);
-            const float min_distance = p1.getRadius() + p2.getRadius();
+            // const float distance = p1.getDistance(p2);
+            // const float min_distance = p1.getRadius() + p2.getRadius();
 
-            if (distance < min_distance) {
-                float penetration = min_distance - distance;
+            // if (distance < min_distance) {
+            //     float penetration = min_distance - distance;
                 
-                // Compute collision normal
-                Vector2 collisionNormal = {
-                    (p1.getX() - p2.getX()) / distance,
-                    (p1.getY() - p2.getY()) / distance
-                };
+            //     // Compute collision normal
+            //     Vector2 collisionNormal = {
+            //         (p1.getX() - p2.getX()) / distance,
+            //         (p1.getY() - p2.getY()) / distance
+            //     };
                 
-                p1.setX(p1.getX() + 0.5 * penetration * collisionNormal.x);
-                p1.setY(p1.getY() + 0.5 * penetration * collisionNormal.y);
+            //     p1.setX(p1.getX() + 0.5 * penetration * collisionNormal.x);
+            //     p1.setY(p1.getY() + 0.5 * penetration * collisionNormal.y);
             
-                p2.setX(p2.getX() - 0.5 * penetration * collisionNormal.x);
-                p2.setY(p2.getY() - 0.5 * penetration * collisionNormal.y);
+            //     p2.setX(p2.getX() - 0.5 * penetration * collisionNormal.x);
+            //     p2.setY(p2.getY() - 0.5 * penetration * collisionNormal.y);
+            // }
+            const Vector2 v {
+                p1.getX() - p2.getX(),
+                p1.getY() - p2.getY()
+            };
+            const float dist2 = v.x * v.x + v.y * v.y;
+            const float min_dist = p1.getRadius() + p2.getRadius();
+            if (dist2 < min_dist * min_dist) {
+                const float dist = sqrt(dist2);
+                const Vector2 n {v.x / dist, v.y / dist};
+                const float mass_ratio_1 = p1.getRadius() / (p1.getRadius() + p2.getRadius());
+                const float mass_ratio_2 = p2.getRadius() / (p1.getRadius() + p2.getRadius());
+                const float delta = 0.5 * response_coef * (dist - min_dist);
+                p1.setX(p1.getX() - n.x * (mass_ratio_2 * delta));
+                p1.setY(p1.getY() - n.y * (mass_ratio_2 * delta));
+            
+                p2.setX(p2.getX() + n.x * (mass_ratio_1 * delta));
+                p2.setY(p2.getY() + n.y * (mass_ratio_1 * delta));
             }
         }
     }

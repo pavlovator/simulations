@@ -6,13 +6,13 @@ int main(void) {
     // Initialization
     const int SCREEN_WIDTH = 1000;
     const int SCREEN_HEIGHT = 1000;
-    int FPS = 30;
+    int FPS = 60;
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Verlet");
     SetTargetFPS(FPS);
 
     Simulation sim(SCREEN_WIDTH, SCREEN_HEIGHT);
-    const int PARTICLE_RADIUS = 15;
+    const int PARTICLE_RADIUS = 10;
 
     while (!WindowShouldClose()) {
         // Event Handling

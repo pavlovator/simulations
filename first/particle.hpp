@@ -5,27 +5,31 @@
 
 class Particle {
 public:
-    Particle(float x, float y, int radius)
+    Particle(float x, float y, float radius)
         : position {x, y}
         , old_position {position}
         , acceleration {0.0f, 0.0f}
-        , radius(radius) {}
+        , radius(radius) {
+        const unsigned char R = GetRandomValue(0, 255);
+        const unsigned char G = GetRandomValue(0, 255);
+        const unsigned char B = GetRandomValue(0, 255);
+        color = Color{R,G,B,255};
+        }
 
     void draw() const;
     void udpatePosition(float dt);
     void accelerate(const Vector2& acc);
     float getX() const {return position.x;}
     float getY() const {return position.y;}
-    int getRadius() const {return radius;}
+    float getRadius() const {return radius;}
     void setX(float x) {position.x = x;}
     void setY(float y) {position.y = y;}
-    void reflectX() {old_position.x = position.x + (position.x - old_position.x);}
-    void reflectY() {old_position.y = position.y + (position.y - old_position.y);}
 
     float getDistance(const Particle& particle) const;
 private:
     Vector2 position;
     Vector2 old_position;
     Vector2 acceleration;
-    int radius;
+    float radius;
+    Color color;
 };
